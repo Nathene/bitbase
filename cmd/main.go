@@ -4,20 +4,58 @@ import (
 	"log"
 
 	"github.com/Nathene/bitbase/game"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/Nathene/bitbase/game/states"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
+type GameApplication struct {
+	stateManager *states.StateManager
+	assetManager *game.AssetManager
+}
+
+// Update updates the game state
+func (g *GameApplication) Update() error {
+	return g.stateManager.Update()
+}
+
+// Draw renders the game
+func (g *GameApplication) Draw(screen *ebiten.Image) {
+	g.stateManager.Draw(screen)
+}
+
+// Layout returns the game's logical screen dimensions
+func (g *GameApplication) Layout(outsideWidth, outsideHeight int) (int, int) {
+	return game.ScreenWidth, game.ScreenHeight
+}
+
 func main() {
-	playerSheet, _, err := ebitenutil.NewImageFromFile("assets/character/base_idle_strip9.png")
-	if err != nil {
-		log.Fatal("Failed to load player sprite sheet")
+	// Create asset manager
+	assetManager := game.NewAssetManager()
+
+	// Create state manager
+	stateManager := states.NewStateManager()
+
+	// Create application
+	app := &GameApplication{
+		stateManager: stateManager,
+		assetManager: assetManager,
 	}
 
-	backgroundImage, _, err := ebitenutil.NewImageFromFile("assets/world/Sunnyside_World_ExampleScene.png")
-	if err != nil {
-		log.Fatal("Failed to load world image")
-	}
+	// Create menu state
+	menuState := states.NewMenuState(assetManager, stateManager)
 
-	g := game.NewGame(playerSheet, backgroundImage)
-	g.Run()
+	// Create loading state as the initial state with menu as the next state
+	loadingState := states.NewLoadingState(assetManager, stateManager, menuState)
+
+	// Push the loading state as the first state
+	stateManager.PushState(loadingState)
+
+	// Set up window
+	ebiten.SetWindowSize(game.ScreenWidth, game.ScreenHeight)
+	ebiten.SetWindowTitle("BitBase Game")
+
+	// Run the game
+	if err := ebiten.RunGame(app); err != nil {
+		log.Fatal(err)
+	}
 }

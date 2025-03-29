@@ -13,12 +13,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+// Define screen dimensions as constants
 const (
-	tileSize     = 32
-	tilesX       = 100
-	tilesY       = 100
-	screenWidth  = 1920
-	screenHeight = 1080
+	ScreenWidth  = 1920
+	ScreenHeight = 1080
+
+	tileSize = 32
+	tilesX   = 100
+	tilesY   = 100
 
 	playerWidth    = tileSize
 	playerHeight   = tileSize
@@ -154,8 +156,8 @@ func (g *Game) Update() error {
 			}
 		}
 	}
-	g.Camera.X = g.Player.GetX() - screenWidth/2
-	g.Camera.Y = g.Player.GetY() - screenHeight/2
+	g.Camera.X = g.Player.GetX() - ScreenWidth/2
+	g.Camera.Y = g.Player.GetY() - ScreenHeight/2
 
 	if ebiten.IsKeyPressed(ebiten.KeyTab) {
 		g.Player.ShowInventory = !g.Player.ShowInventory
@@ -252,14 +254,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return screenWidth, screenHeight
+	return ScreenWidth, ScreenHeight
 }
 
 func (g *Game) Run() {
 	g.Player.AnimFrame = 0
 	g.Player.AnimTimer = 0
 
-	ebiten.SetWindowSize(screenWidth, screenHeight)
+	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("Phase 1: Movement + Camera")
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
